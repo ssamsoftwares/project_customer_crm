@@ -88,7 +88,7 @@ class ProjectController extends Controller
         })->where('status', 'active')->get();
 
 
-        return view('superadmin.projects.edit', compact('project', 'customers', 'projectData',"assignProjectCustomers"));
+        return view('superadmin.projects.edit', compact('project', 'customers', 'projectData', "assignProjectCustomers"));
     }
 
 
@@ -116,7 +116,7 @@ class ProjectController extends Controller
             $project->update($data);
 
             // Update project customer
-            AssignProject::where('project_id',$project->id)->delete();
+            AssignProject::where('project_id', $project->id)->delete();
             foreach ($request->customer_id as $customer) {
                 $data = [
                     'assign_by' => Auth::id(),
@@ -131,7 +131,7 @@ class ProjectController extends Controller
             return Redirect::back()->with('status', $e->getMessage());
         }
         DB::commit();
-        return Redirect::route('projects')->with('status', 'Project Updated Successfully !');
+        return Redirect::back()->with('status', 'Project Updated Successfully !');
     }
 
     public function show(Request $request, Project $project)
@@ -139,15 +139,22 @@ class ProjectController extends Controller
         $search = $request->search;
         $assignProjectCustomers = AssignProject::with('assignby', 'customer')->where('project_id', $project->id);
 
-        // dd($assignProjectCustomers->toArray());
-
-        if (!empty($request->search)) {
-            $assignProjectCustomers->whereHas('customer', function ($custSubQuery) use ($search) {
-                $custSubQuery->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('email', 'like', '%' . $search . '%');
-            });
+        if (!$assignProjectCustomers || !$project) {
+            abort(404);
         }
 
+
+        if (!empty($request->search)) {
+            $assignProjectCustomers->where(function ($query) use ($search) {
+                $query->whereHas('customer', function ($custSubQuery) use ($search) {
+                    $custSubQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                })
+                    ->orWhereHas('assignby', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
 
         $assignProjectCustomers = $assignProjectCustomers->orderBy('id', 'desc')->paginate(10);
         return view('superadmin.projects.view', compact('project', 'assignProjectCustomers', 'search'));
@@ -170,4 +177,10 @@ class ProjectController extends Controller
     }
 
 
+    public function viewProjectComments($projectId)
+    {
+        $project = Project::findOrFail($projectId);
+        $comments = $project->projectComment;
+        return response()->json(['project' => $project, 'comments' => $comments]);
+    }
 }

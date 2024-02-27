@@ -12,7 +12,7 @@
 
 @section('content')
     <x-status-message />
-    <a href="{{ url()->previous() }}" class="btn btn-warning btn-sm m-1">
+    <a href="{{ route('project.show', ['project' => $project->id]) }}" class="btn btn-warning btn-sm m-1">
         <i class="fa fa-backward"></i> Back
     </a>
     <div class="row">

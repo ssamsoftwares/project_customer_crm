@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FormDetailsController;
 use App\Http\Controllers\FormsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectCommentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -68,7 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
    Route::post('project-store/{project?}', [ProjectController::class, 'store'])->name('project.store');
 
 
-   Route::get('project-edit/{project}', [ProjectController::class, 'edit'])->name('project.edit');
+   Route::get('project-edit/{project?}', [ProjectController::class, 'edit'])->name('project.edit');
    Route::post('project-update/{project?}', [ProjectController::class, 'update'])->name('project.update');
 
    Route::get('/project-delete/{project?}', [ProjectController::class, 'delete'])->name('project.delete');
@@ -95,13 +96,48 @@ Route::get('assign-projects-delete/{assignProject?}', [AssignProjectController::
 Route::get('form-details-add',[FormDetailsController::class,'preview'])->name('formDetail.preview');
 
 Route::get('form-details-add/{c_id?}/{p_id?}',[FormDetailsController::class,'create'])->name('formDetail.create');
-Route::post('form-details-store',[FormDetailsController::class,'store'])->name('formDetail.store');
+Route::post('form-details-store/{id?}',[FormDetailsController::class,'store'])->name('formDetail.store');
 
 
 Route::get('form-details-view/{c_id?}/{p_id?}',[FormDetailsController::class,'viewCustomerGetDetailsForm'])->name('formDetail.viewCustomerGetDetailsForm');
 
 
-Route::post('detete-product-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteBrandLogo'])->name('formDetail.formUpdateTimeDeleteBrandLogo');
+
+// Edit Time Delete Image Customer Form Details page
+Route::post('detete-brandLogo-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteBrandLogo'])->name('formDetail.formUpdateTimeDeleteBrandLogo');
+
+Route::post('detete-office-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteOfficeImg'])->name('formDetail.deleteOfficeImg');
+
+Route::post('detete-exterior-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteExterior'])->name('formDetail.deleteExteriorImg');
+
+Route::post('detete-interior-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteInterior'])->name('formDetail.deleteInteriorImg');
+
+Route::post('detete-wrk-place-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteWorkPlace'])->name('formDetail.deleteWorkPlace');
+
+Route::post('detete-machines-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteMachines'])->name('formDetail.deleteMachines');
+
+Route::post('detete-service-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteServiceImg'])->name('formDetail.deleteServiceImg');
+
+
+Route::post('detete-complete-wrk-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteCompletWrk'])->name('formDetail.deleteCompletWrkImg');
+
+Route::post('detete-local-ads-img/{formDetails?}',[FormDetailsController::class, 'formUpdateTimeDeleteLocalAdsImg'])->name('formDetail.deleteLocalAdsImg');
+
+
+
+
+// Project Comment Controller
+
+Route::get('project-comments/{p_id?}',[ProjectCommentController::class,'projectComments'])->name('projectComments');
+
+Route::post('project-comments-store',[ProjectCommentController::class,'store'])->name('projectComment.store');
+
+Route::get('project-comments-edit/{comment?}',[ProjectCommentController::class,'edit'])->name('projectComment.edit');
+
+Route::post('project-comments-update',[ProjectCommentController::class,'update'])->name('projectComment.update');
+
+
+Route::get('project-all-comments/{projectId?}',[ProjectController::class,'viewProjectComments'])->name('project.viewProjectComments');
 
 
 });

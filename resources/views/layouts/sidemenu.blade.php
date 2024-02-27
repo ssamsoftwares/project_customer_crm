@@ -71,6 +71,7 @@
                     @endrole
 
                     @role('customer')
+                    
                     <li>
                         <a href="{{ route('assignProjects') }}" class="waves-effect">
                             <i class="ri-vip-crown-2-line"></i>

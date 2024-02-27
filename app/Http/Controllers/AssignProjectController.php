@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -17,7 +18,7 @@ class AssignProjectController extends Controller
 
     public function assignProject(Request $request)
     {
-
+        $search = $request->search;
         $projects = Project::get();
 
         $customers = User::whereHas('roles', function ($query) {
@@ -27,17 +28,40 @@ class AssignProjectController extends Controller
 
         $assignProjectsQuery = AssignProject::with('assignby', 'customer', 'project');
 
-        // dd($assignProjectsQuery->toArray());
-
         // If user role is "customer", restrict to projects assigned to the current user
         if (auth()->user()->hasRole('customer')) {
             $assignProjectsQuery->where('customer_id', auth()->id());
         }
 
+
+        if (!empty($request->search)) {
+
+            if (Carbon::hasFormat($search, 'd-M-Y')) {
+                $formattedDate = Carbon::createFromFormat('d-M-Y', $search)->format('Y-m-d');
+                // Apply date search
+                $assignProjectsQuery->whereDate('created_at', $formattedDate);
+
+            } else {
+                $assignProjectsQuery->where(function ($subQuery) use ($search) {
+                    $subQuery->orWhereHas('assignby', function ($projectQuery) use ($search) {
+                        $projectQuery->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('project', function ($projectQuery) use ($search) {
+                        $projectQuery->where('project_name', 'like', '%' . $search . '%')
+                            ->orWhere('project_desc', 'like', '%' . $search . '%');
+                    });
+                });
+            }
+        }
+
+
+
         $assignProjects = $assignProjectsQuery->orderBy('id', 'desc')->paginate(10);
 
-        return view('superadmin.assign_projects.assign_project', compact('assignProjects', 'projects', 'customers'));
+        return view('superadmin.assign_projects.assign_project', compact('assignProjects', 'projects', 'customers','search'));
     }
+
+
 
 
     // Store

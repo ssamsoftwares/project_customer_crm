@@ -17,10 +17,20 @@ class Project extends Model
         return $this->belongsTo(User::class,'assign_by');
     }
 
-    
+
     public function assignments()
     {
         return $this->hasMany(AssignProject::class, 'project_id');
+    }
+
+
+    public function projectComment()
+    {
+        return $this->hasMany(ProjectComment::class, 'project_id');
+    }
+
+    public function projectCommentBy(){
+        return $this->belongsTo(User::class,'comment_by');
     }
 
 

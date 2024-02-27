@@ -23,10 +23,11 @@
             <div class="card border border-secondary rounded">
                 <div class="card-header d-flex justify-content-between">
                     <h5>{{ 'Project Profile' }}</h5>
-                    {{-- @role('superadmin')
-                        <a href="#"
+
+                    @role('superadmin')
+                        <a href="{{ route('project.edit', ['project' => $project->id]) }}"
                             class="float-end btn btn-info"><i class="fa fa-pencil-square"></i></a>
-                    @endrole --}}
+                    @endrole
                 </div>
 
                 <div class="card-body">
@@ -34,14 +35,14 @@
                         <div class="col-4">
                             <b>Project Name :</b>
                             <span>
-                                {{ $project->project_name }}
+                                {{ $project->project_name ?? ''}}
                             </span>
                         </div>
 
                         <div class="col-4">
                             <b>Assign By:</b>
                             <span>
-                                {{ $project->assignby->name }}
+                                {{ $project->assignby->name ?? '' }}
                             </span>
                         </div>
 
@@ -119,8 +120,6 @@
 
 
                                             <a href="{{route('formDetail.viewCustomerGetDetailsForm',['c_id'=>$customer->customer->id,'p_id'=>$customer->project->id])}}" class="btn btn-secondary btn-sm"> <i class="fa fa-eye"></i> Preview </a>
-
-
 
                                         </td>
 
