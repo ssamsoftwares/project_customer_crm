@@ -65,7 +65,8 @@
         <div class="col-12">
             <div class="card">
                 <div class="justify-content-end d-flex">
-                    <x-search.table-search action="{{route('assignProjects')}}" method="get" name="search" value="{{$search}}" btnClass="search_btn" />
+                    <x-search.table-search action="{{ route('assignProjects') }}" method="get" name="search"
+                        value="{{ $search }}" btnClass="search_btn" />
                 </div>
 
                 <div class="card-body">
@@ -95,16 +96,16 @@
                                         <td>{{ $p->project->project_name }}</td>
                                         <td>{{ $p->project->project_desc }}</td>
                                         <td>{{ $p->assignby->name }}
-                                        <br>
-                                        <span>Date: {{ $p->created_at->format('d-M-Y') }}</span>
+                                            <br>
+                                            <span>Date: {{ $p->created_at->format('d-M-Y') }}</span>
                                         </td>
 
                                         <td>
-                                            <a href="{{ route('formDetail.create', ['c_id' => $p->customer->id, 'p_id' => $p->project->id]) }}"
+                                            <a href="{{ route('formDetail.create', ['c_id' => $p->customer->id]) }}"
                                                 class="btn btn-info btn-sm">{{ $p->project->form_name }}</a>
 
-                                            <a href="javascript:void(0)" class="btn btn-warning btn-sm"
-                                                onclick="viewProjectComment(<?= $p->id ?>)">View Comments</a>
+                                            <a href="{{ route('viewCustomerProjectComments', ['projectId' => $p->project->id]) }}"
+                                                class="btn btn-success btn-sm">View Comments</a>
                                         </td>
 
                                         <td>
@@ -128,74 +129,7 @@
             </div>
         </div> <!-- end col -->
     </div> <!-- end row -->
-
-    {{-- Comment Model Form --}}
-
-    <div class="modal fade" id="commentViewModel" tabindex="-1" aria-labelledby="commentViewModelLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-dark" id="commentViewModelLabel">{{ 'View Project Comments' }}</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul id="commentList"></ul>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('script')
-
-<script>
-    function viewProjectComment(projectId) {
-        $.ajax({
-            url: '/project-all-comments/' + projectId,
-            type: 'GET',
-            success: function(response) {
-
-                var project = response.project;
-                var comments = response.comments;
-                var commentList = $('#commentList');
-                var modalTitle = $('#commentViewModelLabel');
-
-                modalTitle.text('View Project Comments - ' + project.project_name);
-
-                commentList.empty();
-
-                if (comments.length > 0) {
-                    comments.forEach(function(comment) {
-                        var formattedDate = new Date(comment.created_at).toLocaleDateString(
-                            'en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            });
-
-                        var listItem = $('<li></li>');
-                        var commentContainer = $('<div></div>');
-                        var commentText = $('<strong>' + comment.comment + '</strong>');
-                        var dateText = $('<span style="color: #0F7694; font-weight: bold;">' + ' - ' +
-                            formattedDate + '</span>')
-
-                        commentContainer.append(commentText);
-                        commentContainer.append(dateText);
-                        listItem.append(commentContainer);
-                        commentList.append(listItem);
-                    });
-                } else {
-                    commentList.append('<strong>No comments available.</strong>');
-                }
-
-                // Show the modal
-                $('#commentViewModel').modal('show');
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    }
-
-</script>
 @endpush

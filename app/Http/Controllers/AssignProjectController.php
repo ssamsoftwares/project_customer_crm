@@ -40,16 +40,15 @@ class AssignProjectController extends Controller
                 $formattedDate = Carbon::createFromFormat('d-M-Y', $search)->format('Y-m-d');
                 // Apply date search
                 $assignProjectsQuery->whereDate('created_at', $formattedDate);
-
             } else {
                 $assignProjectsQuery->where(function ($subQuery) use ($search) {
                     $subQuery->orWhereHas('assignby', function ($projectQuery) use ($search) {
                         $projectQuery->where('name', 'like', '%' . $search . '%');
                     })
-                    ->orWhereHas('project', function ($projectQuery) use ($search) {
-                        $projectQuery->where('project_name', 'like', '%' . $search . '%')
-                            ->orWhere('project_desc', 'like', '%' . $search . '%');
-                    });
+                        ->orWhereHas('project', function ($projectQuery) use ($search) {
+                            $projectQuery->where('project_name', 'like', '%' . $search . '%')
+                                ->orWhere('project_desc', 'like', '%' . $search . '%');
+                        });
                 });
             }
         }
@@ -58,10 +57,8 @@ class AssignProjectController extends Controller
 
         $assignProjects = $assignProjectsQuery->orderBy('id', 'desc')->paginate(10);
 
-        return view('superadmin.assign_projects.assign_project', compact('assignProjects', 'projects', 'customers','search'));
+        return view('superadmin.assign_projects.assign_project', compact('assignProjects', 'projects', 'customers', 'search'));
     }
-
-
 
 
     // Store
@@ -94,6 +91,50 @@ class AssignProjectController extends Controller
         DB::commit();
         return Redirect::back()->with('status', 'Assign Project Successfully done !');
     }
+
+
+    // View Comment Customer Side
+
+
+    public function viewCustomerProjectComments(Request $request, $projectId)
+    {
+        $project = Project::with(['projectComment' => function ($query) {
+            $query->orderBy('id', 'desc')->with('commentBy');
+        }])->findOrFail($projectId);
+
+        $commentsQuery = $project->projectComment();
+
+        // Filter by from_date
+        if ($request->filled('from_date')) {
+            $fromDate = $request->from_date;
+            $commentsQuery->whereDate('created_at', '>=', $fromDate);
+        }
+
+        // Filter by to_date
+        if ($request->filled('to_date')) {
+            $toDate = $request->to_date;
+            $commentsQuery->whereDate('created_at', '<=', $toDate);
+        }
+
+        // search  data
+        if ($request->filled('search')) {
+            $searchQuery = $request->search;
+            $commentsQuery->where('comment', 'like', "%$searchQuery%");
+        }
+
+        // Paginate the results
+        $comments = $commentsQuery->paginate(10);
+
+        return view('superadmin.assign_projects.cust_view_comment', compact('project', 'comments'));
+    }
+
+
+
+
+
+
+
+
 
 
     // show

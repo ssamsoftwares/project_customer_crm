@@ -6,6 +6,7 @@ use App\Http\Controllers\FormDetailsController;
 use App\Http\Controllers\FormsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectCommentController;
+use App\Http\Controllers\ProjectCommentNotificationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -30,6 +31,12 @@ if (env('APP_ENV') === 'production') {
     URL::forceSchema('https');
     // \URL::forceScheme('https');
 }
+
+
+Route::get('/testing-data', function () {
+   return view('testing-data');
+});
+
 
 
 Route::get('/', function () {
@@ -130,14 +137,24 @@ Route::post('detete-local-ads-img/{formDetails?}',[FormDetailsController::class,
 
 Route::get('project-comments/{p_id?}',[ProjectCommentController::class,'projectComments'])->name('projectComments');
 
+Route::get('project-comments-add/{p_id?}',[ProjectCommentController::class,'create'])->name('projectComment.create');
+
 Route::post('project-comments-store',[ProjectCommentController::class,'store'])->name('projectComment.store');
 
 Route::get('project-comments-edit/{comment?}',[ProjectCommentController::class,'edit'])->name('projectComment.edit');
 
 Route::post('project-comments-update',[ProjectCommentController::class,'update'])->name('projectComment.update');
 
+Route::get('project-comments-delete/{comment?}',[ProjectCommentController::class,'delete'])->name('projectComment.delete');
+
 
 Route::get('project-all-comments/{projectId?}',[ProjectController::class,'viewProjectComments'])->name('project.viewProjectComments');
+
+
+Route::get('mark-as-read-comment-noti/{notification?}',[ProjectCommentNotificationController::class,'markAsReadNotification'])->name('markAsReadNotification');
+
+
+Route::get('all-project-Comments/{projectId?}',[AssignProjectController::class,'viewCustomerProjectComments'])->name('viewCustomerProjectComments');
 
 
 });

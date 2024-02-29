@@ -11,18 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project_comments', function (Blueprint $table) {
+        Schema::create('project_comment_notifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
-            // $table->unsignedBigInteger('customer_id');
-            $table->unsignedBigInteger('comment_by');
-            $table->longText('comment');
+            $table->longText('notification_msg');
+            $table->enum('status', ['seen', 'unseen'])->default('unseen')->nullable();
             $table->timestamps();
-
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('comment_by')->references('id')->on('users')->onDelete('cascade');
-            // $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
-
         });
     }
 
@@ -31,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_comments');
+        Schema::dropIfExists('project_comment_notifications');
     }
 };

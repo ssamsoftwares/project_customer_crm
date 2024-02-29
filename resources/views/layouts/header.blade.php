@@ -23,7 +23,7 @@
 
             <x-snippets.full-screen show="true" />
 
-            <x-snippets.notifications show="false" />
+            <x-snippets.notifications show="true" />
 
             <x-snippets.profile-menu show="true" />
 

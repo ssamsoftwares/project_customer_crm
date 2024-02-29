@@ -466,8 +466,8 @@ class FormDetailsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'legal_business_name' => 'required',
-            'brand_name' => 'required',
+            // 'legal_business_name' => 'required',
+            // 'brand_name' => 'required',
             'brand_logo.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
             'office_images.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
             'exterior.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
@@ -477,7 +477,7 @@ class FormDetailsController extends Controller
             'product_services_photos.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
             'completed_work.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
             'completed_work.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
-            'local_ads_images' => 'nullable|image|mimes:png,jpg,jpeg,webp',
+            'local_ads_images.*' => 'nullable|image|mimes:png,jpg,jpeg,webp',
         ]);
 
         DB::beginTransaction();
@@ -564,21 +564,6 @@ class FormDetailsController extends Controller
             $formDetails = FormDetails::find($request->id);
 
             // BRAND LOGO
-
-            // if ($brandLogireqImg = $request->file('brand_logo')) {
-            //     $destination = "/formDetails/brand_logo/";
-            //     $oldImages = json_decode($formDetails->brand_logo);
-
-            //     foreach ($brandLogireqImg as $img) {
-
-            //         $rand = Str::random(5);
-            //         $imgName = $rand . '-' . time() . '-' . $img->getClientOriginalName();
-            //         $img->move(public_path() . $destination, $imgName);
-            //         $imageData[] = '/formDetails/brand_logo/' . $imgName;
-            //     }
-            //     $allimgs = array_merge($oldImages, $imageData);
-            //     $data['brand_logo'] = json_encode($allimgs);
-            // }
 
             if ($brandLogireqImg = $request->file('brand_logo')) {
                 $destination = "/formDetails/brand_logo/";
@@ -743,7 +728,6 @@ class FormDetailsController extends Controller
 
             // LOCAL ADS IMAGES
 
-
             if ($reqLocalImg = $request->file('local_ads_images')) {
                 $destination = "/formDetails/local_ads_images/";
                 $oldImages = json_decode($formDetails->local_ads_images) ?? [];
@@ -767,6 +751,15 @@ class FormDetailsController extends Controller
             } else {
                 FormDetails::create($data);
             }
+
+            // if ($request->has('id')) {
+            //     $formDetails = FormDetails::find($request->id);
+            //     $formDetails->update($data);
+            // } else {
+            //     FormDetails::create($data);
+            // }
+
+
         } catch (Exception $e) {
             DB::rollBack();
             return Redirect::back()->with('status', $e->getMessage());

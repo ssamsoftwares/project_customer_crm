@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssignProject;
 use App\Models\Project;
 use App\Models\ProjectComment;
+use App\Models\ProjectCommentNotification;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,15 +15,21 @@ use Illuminate\Support\Facades\Redirect;
 class ProjectCommentController extends Controller
 {
 
-    public function projectComments(Request $request,$p_id=null)
+    public function projectComments(Request $request, $p_id = null)
     {
         $search = $request->search;
         $project = Project::where('id', $p_id)->first();
         if (!$project) {
             abort(404);
         }
+
+        $assignProjectsCustomer = AssignProject::with('assignby', 'customer', 'project')->where('project_id', $p_id)->get();
+
+        // dd($assignProjectsCustomer->toArray());
+
         $projectComments = ProjectComment::with('project', 'commentBy')->where('project_id', $p_id);
 
+        // dd($projectComments->toArray());
 
         if (!empty($search)) {
             if (Carbon::hasFormat($search, 'd-M-Y')) {
@@ -43,9 +51,16 @@ class ProjectCommentController extends Controller
 
         $projectComments = $projectComments->orderBy('id', 'desc')->paginate(10);
 
-        return view('superadmin.projectComment.comment', compact('projectComments', 'project'));
+        return view('superadmin.projectComment.comment', compact('projectComments', 'project', 'assignProjectsCustomer'));
     }
 
+
+    // Add Project Comment view
+    public function create($p_id)
+    {
+        $project = Project::find($p_id);
+        return view('superadmin.projectComment.add', compact('project'));
+    }
 
 
     // Store Project Comment
@@ -66,7 +81,13 @@ class ProjectCommentController extends Controller
                 'comment' => $request->comment,
             ];
 
-            ProjectComment::create($data);
+            $projectComment = ProjectComment::create($data);
+
+            ProjectCommentNotification::create([
+                'project_id' => $request->project_id,
+                'notification_msg' => $request->comment,
+                'status' => "unseen"
+            ]);
         } catch (Exception $e) {
             DB::rollback();
             return Redirect::back()->with('status', $e->getMessage());
@@ -75,13 +96,19 @@ class ProjectCommentController extends Controller
         return Redirect::back()->with('status', 'Project Comment Added Successfully Done');
     }
 
+
+
+
     // Edit Comment
     public function edit(ProjectComment $comment)
     {
         $comment = ProjectComment::with('project')
             ->where('id', $comment->id)
             ->first();
-        return response()->json(['status' => 200, 'data' => $comment]);
+
+            // dd($comment->toArray());
+            return view('superadmin.projectComment.edit',compact('comment'));
+        // return response()->json(['status' => 200, 'data' => $comment]);
     }
 
     // update Project Comment
@@ -113,5 +140,16 @@ class ProjectCommentController extends Controller
     }
 
 
-
+    public function delete(ProjectComment $comment)
+    {
+        DB::beginTransaction();
+        try {
+            $comment->delete();
+        } catch (Exception $e) {
+            DB::rollback();
+            return Redirect::back()->with('status', $e->getMessage());
+        }
+        DB::commit();
+        return Redirect::back()->with('status', 'Project Comment Deleted Successfully Done');
+    }
 }

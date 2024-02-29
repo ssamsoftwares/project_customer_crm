@@ -73,7 +73,7 @@
                                     <th>{{ 'Project Name' }}</th>
                                     <th>{{ 'Project Description' }}</th>
                                     <th>{{ 'Status' }}</th>
-                                    <th>{{ 'Comments' }}</th>
+                                    {{-- <th>{{ 'Comments' }}</th> --}}
                                     <th>{{ 'Actions' }}</th>
                                 </tr>
                             </thead>
@@ -89,12 +89,9 @@
                                         <td>{{ $p->project_desc }}</td>
                                         <td>{{ Str::ucfirst($p->status)}}</td>
 
-                                        <td>
+                                        {{-- <td>
                                             <a href="javascript:void(0)" class="btn btn-warning btn-sm" onclick="viewProjectComment(<?= $p->id ?>)">View Comments </a>
-
-                                            {{-- <a href="javascript:void(0)" class="btn btn-warning btn-sm"
-                                            onmouseover="viewProjectComment(<?= $p->id?>)">View Comment</a> --}}
-                                        </td>
+                                        </td> --}}
 
                                         <td>
                                             <a href="{{ route('project.show', ['project' => $p->id]) }}"
@@ -107,11 +104,7 @@
                                                 <a href="{{ route('projectComments',['p_id' =>$p->id]) }}"
                                                     class="btn btn-info btn-sm">Comments </a>
 
-                                            {{-- <a href="{{ route('project.edit', ['project' => $p->id]) }}"
-                                                class="btn btn-warning"><i class="fa fa-pencil"></i> </a> --}}
-
                                         </td>
-
 
                                     </tr>
                                 @endforeach

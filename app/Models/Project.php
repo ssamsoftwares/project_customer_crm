@@ -10,11 +10,12 @@ class Project extends Model
     use HasFactory;
 
     protected $fillable = [
-        'assign_by','form_name', 'project_name','project_desc','project_status','status'
+        'assign_by', 'form_name', 'project_name', 'project_desc', 'project_status', 'status'
     ];
 
-    public function assignby(){
-        return $this->belongsTo(User::class,'assign_by');
+    public function assignby()
+    {
+        return $this->belongsTo(User::class, 'assign_by');
     }
 
 
@@ -29,9 +30,13 @@ class Project extends Model
         return $this->hasMany(ProjectComment::class, 'project_id');
     }
 
-    public function projectCommentBy(){
-        return $this->belongsTo(User::class,'comment_by');
+    public function projectCommentBy()
+    {
+        return $this->hasMany(ProjectComment::class, 'comment_by');
     }
 
-
+    public function projectCommentNotification()
+    {
+        return $this->hasMany(ProjectCommentNotification::class, 'project_id');
+    }
 }
